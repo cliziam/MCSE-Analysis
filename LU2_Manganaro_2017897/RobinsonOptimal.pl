@@ -1,5 +1,3 @@
-
-
 % Story steps 
 step(1, "Escape, sea voyage").
 step(2, "Captured by a Turkish pirate, imprisoned").
@@ -80,7 +78,9 @@ puzzle(5, "The Famous Parrot: ", "In the story, what is the name of the famous p
 % Predicate to manage user choice and consequences
 :- discontiguous start_game/0.
 :- dynamic current_step/1.
+% Inventory
 :- dynamic inventory/1.
+inventory([]).
 current_step(1).
 % Inizializza lo stato del gioco
 start_game :-
@@ -149,8 +149,12 @@ process_choice(CurrentStep, UserChoice) :-
             write(Feedback), nl,
             read(UserAnswer),
             check_puzzle_answer(UserAnswer, Solution),
+            display_inventory_progress,
+            check_inventory_progress,
             display_options_and_continue
         ;
+            display_inventory_progress,
+            check_inventory_progress,
             display_options_and_continue
         )
     ;
@@ -187,8 +191,28 @@ check_puzzle_answer(UserAnswer, Solution) :-
 
 % Aggiunge un elemento all'inventario
 add_to_inventory(Item) :-
-    retract(inventory(Inventory)),
-    asserta(inventory([Item | Inventory])).
+    inventory(Inventory),
+    append(Inventory, [Item], NewInventory),
+    retractall(inventory(_)),
+    asserta(inventory(NewInventory)).
+
+display_inventory_progress :-
+    inventory(Inventory),
+    length(Inventory, Pieces),
+    write('Inventory Progress: '), write(Pieces), write('/2 pieces collected.'), nl.
+    
+
+check_inventory_progress :-
+    inventory(Inventory),
+    length(Inventory, Pieces),
+    (Pieces >= 2 ->
+        write('Congratulations! You have gathered enough puzzle pieces to unlock a special item.'), nl,
+        unlock_special_item;
+        true
+    ).
+
+unlock_special_item :-
+    write('You unlocked a special item: Bible! This item may be useful in your journey.'), nl.
 
 
 
