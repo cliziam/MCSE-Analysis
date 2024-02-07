@@ -1,17 +1,3 @@
-### Titolo del Progetto
-**The Analytical Geometry of the Plane**
-
-### Descrizione del Progetto
-Il progetto tratta della geometria analitica del piano, consentendo agli utenti di visualizzare graficamente le funzioni lineari, circolari, paraboliche ed ellittiche. Gli utenti possono inserire le equazioni delle funzioni e il programma disegnerà i grafici corrispondenti.
-
-### Soluzione Sufficiente (6/10)
-```javascript
-
-```
-
-### Soluzione Ottimale (10/10)
-```javascript
-
 setActiveCanvas("graphic");
 var width = getProperty("graphic", "width");
 var height = getProperty("graphic", "height");
@@ -369,11 +355,4 @@ onEvent("draw", "click", function( ) {
   }
   
 });
-
-
-
-
-```
-
----
 
