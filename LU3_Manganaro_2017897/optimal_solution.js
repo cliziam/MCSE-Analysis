@@ -201,7 +201,7 @@ onEvent("equal", "click", function() {
         case "line":
             if (!isLinearFunction(funcString)) {
                 showElement("alert");
-                setText("alert", "Error. For level " + count + ", enter the equation of a line in the form y=.");
+                setText("alert", "Error. For level " + count + ", enter the equation of a line in the form y=mx+q.");
                 return;
             }
             drawLinearFunction(funcString);
@@ -210,7 +210,7 @@ onEvent("equal", "click", function() {
         case "circle":
             if (!isCircleFunction(funcString)) {
                 showElement("alert");
-                setText("alert", "Error. For level " + count + ", enter the equation of a circle with center at the origin of the axes.");
+                setText("alert", "Error. For level " + count + ", enter the equation of a circle with center at the origin of the axes and radius=2.");
                 return;
             }
             drawCircleFunction(funcString,width/2,height / 2 );
@@ -290,7 +290,7 @@ onEvent("draw", "click", function( ) {
             drawAxes();
             drawLinearFunction(equation);
             showElement("alert");
-            setText("alert", "Equation: " + equation+".\n Remember that you have to insert the equation of the line in the form y=mx+q in order to proceed to the next level.");
+            setText("alert", "Equation: " + equation+".\n Remember that you have to insert the equation of the line in the form y=mx+q in order to proceed to the next level. (on the left side)");
         } else {
             showElement("alert");
             setText("alert", "Make sure to enter all values for a, b, and c.");
@@ -312,7 +312,7 @@ onEvent("draw", "click", function( ) {
 
         drawCircle(a, b, c);
         showElement("alert");
-        setText("alert", "Equation: " + equation+"\n. Remember that you have to insert the equation of the circle with center at the origin and the radius is 2.");
+        setText("alert", "Equation: " + equation+"\n Remember that you have to insert the equation of the circle with center at the origin and the radius=2.");
     } else {
             showElement("alert");
             setText("alert", "Make sure to enter all values for a, b, and c.");
