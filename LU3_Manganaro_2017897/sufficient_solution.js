@@ -6,9 +6,7 @@ var arrowOffset = 5;
 var count=1;
 
 var levels = {"1": "line",
-              "2": "circle",
-              "3": "parabola",
-              "4": "ellipse"
+              "2": "circle"
 };
 
 setScreen("SpiegazioneLivello");
@@ -56,28 +54,6 @@ function isCircleFunction(equation) {
     return pattern.test(equation);
 }
 
-function isParabolaFunction(equation) {
-    var parabolaPattern = /^y\s*=\s*2\s*(\*\s*)?x\s*\^\s*2\s*$/i;
-    console.log("l'equazione è " + equation);
-    var formattedEquation = equation.toLowerCase().replace(/\s/g, '');
-
-    var isParabola = parabolaPattern.test(formattedEquation);
-    console.log("Is Parabola? " + isParabola);
-    return isParabola;
-}
-
-
-
-function isEllipseFunction(equation) {
-    var ellipsePattern = /\(x\s*\^\s*2\s*\/\s*25\)\s*\+\s*\(y\s*\^\s*2\s*\/\s*9\)\s*=\s*1/;
-    var ellipsePattern2 = /\s*x\s*\^\s*2\s*\/\s*25\s*\+\s*y\s*\^\s*2\s*\/\s*9\s*=\s*1/;
-
-    console.log("L'equazione è " + equation);
-  
-    var isEllisse = ellipsePattern.test(equation) || ellipsePattern2.test(equation);
-    console.log("Is Ellisse? " + isEllisse);
-    return isEllisse;
-}
 
 
 function drawLinearFunction(equation) {
@@ -129,61 +105,6 @@ function drawCircle(a, b, c) {
     }
 }
 
-
-function drawParabolaFunction(equation) {
-    var parabolaPattern = /^y\s*=\s*([+-]?\s*\d+(\.\d+)?\s*)?(\*?\s*x\s*\^\s*2)?\s*([+-]\s*\d+(\.\d+)?\s*\*?\s*x)?\s*([+-]\s*\d+(\.\d+)?)?\s*$/i;
-    var match = equation.match(parabolaPattern);
-     if (match === null) {
-        console.log('Invalid equation');
-    }
-    var a = parseFloat(match[1] || '1');
-    var b = parseFloat(match[5] || '0');
-    var c = parseFloat(match[9] || '0');
-    var range = 10;
-    var scaleFactor = Math.min(width, height) / (2 * range);
-
-    for (var x = -range; x <= range; x += 0.1) {
-        var y = a * Math.pow(x, 2) + b * x + c;
-        var plotX = width / 2 + x * scaleFactor;
-        var plotY = height / 2 - y * scaleFactor;
-        rect(plotX, plotY, 1, 1);
-    }
-}
-
-function drawParabola(a, b, c) {
-    var range = 10;
-    var scaleFactor = Math.min(width, height) / (2 * range);
-    for (var x = -range; x <= range; x += 0.1) {
-        var y = a * Math.pow(x, 2) + b * x + c;
-        var plotX = width / 2 + x * scaleFactor;
-        var plotY = height / 2 - y * scaleFactor;
-        rect(plotX, plotY, 1, 1);
-    }
-}
-function drawEllipseFunction(equation) {
-    var pattern = /\(x\s*\^\s*2\s*\/\s*(\d+)\)\s*\+\s*\(y\s*\^\s*2\s*\/\s*(\d+)\)\s*=\s*1/;
-    var match = equation.match(pattern);
-    if (match === null) {
-        console.log('Invalid equation');
-        return;
-    }
-    var a = Math.sqrt(parseFloat(match[2])); 
-    var b = Math.sqrt(parseFloat(match[1])); 
-
-    var rangeX = width / 2;
-    var rangeY = height / 2;
-    var scaleFactorX = rangeX / a;
-    for (var y = -rangeY; y <= rangeY; y += 0.01) {
-        var x = a * Math.sqrt(1 - Math.pow(y / b, 2));
-        var plotX1 = width / 2 + x * scaleFactorX;
-        var plotY1 = height / 2 + y;
-        var plotX2 = width / 2 - x * scaleFactorX;
-        var plotY2 = height / 2 + y;
-        rect(plotX1, plotY1, 1, 1);
-        rect(plotX2, plotY2, 1, 1);
-    }
-}
-
 onEvent("equal", "click", function() {
     setActiveCanvas("graphic");
     clearCanvas();
@@ -216,31 +137,12 @@ onEvent("equal", "click", function() {
             drawCircleFunction(funcString,width/2,height / 2 );
             break;
       
-            
-        case "parabola":
-              console.log("la funzione è"+funcString);
-              if (!isParabolaFunction(funcString)) {
-                showElement("alert");
-                setText("alert", "Error. For level " + count + ",enter the equation of a parabola passing through the point (1,2) and having the vertex at the origin");                
-                return;
-            }
-            drawParabolaFunction(funcString);
-            break;
-            
-         case "ellipse":
-              if (!isEllipseFunction(funcString)) {
-                showElement("alert");
-                setText("alert", "Error. For level " + count + ", enter the equation of an ellipse with vertices at points v1:(5, 0), v2: (-5, 0), v3:(0,3), v4:(0,-3)");
-                return;
-            }
-            drawEllipseFunction(funcString);
-            break;
         default:
             break;
     }
     
     count++;
-    if (count === 5) {
+    if (count === 3) {
               showElement("final");
               return; 
             }
@@ -261,12 +163,6 @@ onEvent("next", "click", function( ) {
   else if(count==2){
     setText("Funzione", "Circle with r=2 and center at (0,0)");
   }
-  else if(count==3){
-    setText("Funzione", "Parabola with vertex at (0,0) and passing through (1,2)");
-  }
-  else if(count==4){
-    setText("Funzione", "Ellipse with vertices at (5,0), (-5,0), (0,3), (0,-3)");
-  }
 
 });
 
@@ -278,7 +174,7 @@ onEvent("draw", "click", function( ) {
     a = a.toFixed(2);
     b = b.toFixed(2);
     c = c.toFixed(2);
-   if (count === 1) {
+    if (count === 1) {
         if (!isNaN(a) && !isNaN(b) && !isNaN(c)) {
             var m=(-a / b);
             m=m.toFixed(2);
@@ -312,49 +208,13 @@ onEvent("draw", "click", function( ) {
 
         drawCircle(a, b, c);
         showElement("alert");
-        setText("alert", "Equation: " + equation+"\n. Remember that you have to insert the equation of the circle with center at the origin and the radius is 2.");
+        setText("alert", "Equation: " + equation+"\n Remember that you have to insert the equation of the circle with center at the origin and the radius is 2.");
     } else {
             showElement("alert");
             setText("alert", "Make sure to enter all values for a, b, and c.");
             }
   }
-  else if(count==3){
-    if (!isNaN(a) && !isNaN(b) && !isNaN(c)) {
-      var equation = "y = " + a + "x^2 " + (b < 0 ? "-" : "+") + " " + Math.abs(b) + "x " + (c < 0 ? "-" : "+") + " " + Math.abs(c);
-      console.log(equation);
-      setActiveCanvas("graphic");
-      clearCanvas();
-      drawAxes();
-  
-      drawParabola(a, b, c);
-      showElement("alert");
-      setText("alert", "Equation: " + equation+ "\nRemember that you have to insert the equation of the parabola with the vertex at the origin and passing through the point (1,2) in order to proceed to the next level.");
-    } else {
-      showElement("alert");
-      console.log("Make sure to enter all the values a, b and c.");
-      setText("alert", "Make sure to enter all the values a, b and c.");
-    }
-  }
-  else if(count==4){
-    if(!isNaN(c)){
-      showElement("alert");
-      setText("alert", "You can't insert c for ellipse equation.");
-    }
-    else if (!isNaN(a) && !isNaN(b)) {
-      var equation = "x^2/" + a*a + " - y^2/" + b*b + " = 1";
-      console.log(equation);
-      setActiveCanvas("graphic");
-      clearCanvas();
-      drawAxes();
-      showElement("alert");
-      setText("alert", "Equation: " + equation+ "\nRemember that you have to insert the equation of the ellipse with the vertices at points v1:(5, 0), v2: (-5, 0), v3:(0,3), v4:(0,-3) in order to proceed to the next level.");
-    } else {
-      showElement("alert");
-      console.log("Make sure to enter all the values a, b.");
-      setText("alert", "Make sure to enter all the values a, b.");
-    }
-
-  }
+ 
   
 });
 
