@@ -1,4 +1,5 @@
 ## The Analytical Geometry of the Plane
+[App Link](https://studio.code.org/projects/applab/GqLGFKSLqW4d6yFarzzGC31aBcspnpFWGP0KhItHgRM)
 
 ### Description of the Learning Unit:
 This learning unit focuses on the analytic geometry of the plane, providing students with the opportunity to graphically explore linear, circular, parabolic, and elliptical functions. It consists of two main sections within the app:
@@ -10,7 +11,7 @@ Develop an application with levels (from first to fourth) where specific data is
 Implement a section that allows users to input the values of coefficients (a, b, c) to correctly generate the equation of the desired function. This approach enables students to explore in a more dynamic and interactive manner, allowing them to experiment with different parameters and observe how they influence the shape and position of the function in the Cartesian plane.
 
 
-### Optimal Solution (10/10)
+### [Optimal Solution](https://studio.code.org/projects/applab/GqLGFKSLqW4d6yFarzzGC31aBcspnpFWGP0KhItHgRM) (10/10) 
 ```javascript
     setActiveCanvas("graphic");
 var width = getProperty("graphic", "width");
@@ -375,7 +376,7 @@ onEvent("draw", "click", function( ) {
 
 ```
 
-### Sufficient Solution (6/10)
+### [Sufficient Solution](https://studio.code.org/projects/applab/JaUvuyr0Ix79IB2QefUv5dcuqLiuidguU-v8u2Nzo9E)(6/10)
 ```javascript
 setActiveCanvas("graphic");
 var width = getProperty("graphic", "width");
