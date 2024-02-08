@@ -1,4 +1,4 @@
-### Title: The Analytical Geometry of the Plane
+## The Analytical Geometry of the Plane
 
 ### Description of the Learning Unit:
 This learning unit focuses on the analytic geometry of the plane, providing students with the opportunity to graphically explore linear, circular, parabolic, and elliptical functions. It consists of two main sections within the app:
