@@ -191,7 +191,8 @@ onEvent("equal", "click", function() {
     hideElement("alert");
     
     var funcString = getText("function1").trim();
-    
+    funcString = funcString.toLowerCase();
+    console.log(funcString);
     var functionType = levels[count];
     if (!functionType) {
         console.log("Livello non valido!");
@@ -201,7 +202,7 @@ onEvent("equal", "click", function() {
         case "line":
             if (!isLinearFunction(funcString)) {
                 showElement("alert");
-                setText("alert", "Error. For level " + count + ", enter the equation of a line in the form y=mx+q.");
+                setText("alert", "Error. For level " + count + ", enter the equation of a line in the form y=.");
                 return;
             }
             drawLinearFunction(funcString);
@@ -210,7 +211,7 @@ onEvent("equal", "click", function() {
         case "circle":
             if (!isCircleFunction(funcString)) {
                 showElement("alert");
-                setText("alert", "Error. For level " + count + ", enter the equation of a circle with center at the origin of the axes and radius=2.");
+                setText("alert", "Error. For level " + count + ", enter the equation of a circle with center at the origin of the axes.");
                 return;
             }
             drawCircleFunction(funcString,width/2,height / 2 );
