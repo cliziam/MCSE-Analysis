@@ -1,4 +1,4 @@
-% Story steps 
+% Elenco degli steps inviduati nel racconto
 step(1, "Escape, sea voyage").
 step(2, "Captured by a Turkish pirate, imprisoned").
 step(3, "Prosperity in Brazil, purchase of plantations").
@@ -12,7 +12,7 @@ step(10, "Return to my homeland").
 step(11, "The end.").
 
 
-% Add the description of the story
+% Descrizione della storia di Robinson Crusoe
 story_detail(1, "Escape, sea voyage", "At the age of 19, I decided to leave the house in search of sea adventures.").
 story_detail(2, "Captured by a Turkish pirate, imprisonment", "After an initial shipwreck, I was captured by a Turkish pirate.").
 story_detail(3, "Prosperity in Brazil, buying plantations", "In Brazil, I bought a plantation and prospered as a farmer.").
@@ -24,19 +24,19 @@ story_detail(8, "Failed attempt to leave with a small boat", "I wanted to leave 
 story_detail(9, "Escape from the island", "Finally, I manage to have a ship sufficient enough to make the journey and return home.").
 story_detail(10, "Return to my homeland", "Back in London, I discovered that I had become rich thanks to the proceeds of the plantation in Brazil.").
 
-% Choices
+% Scelte che l'utente può fare
 choices(1, ["Board the ship to begin the journey", "Stay at home and give up the adventure"]).
-choices(2, ["Try to escape from prison", "Accept your fate as a prisoner"]).
+choices(2, ["Accept your fate as a prisoner", "Try to escape from prison"]).
 choices(3, ["Invest your earnings in new business ventures", "Live a peaceful life with your plantation"]).
 choices(4, ["Explore the island for resources", "Try to build a boat to leave the island"]).
-choices(5, ["Continue improving your cabin and survival skills", "Explore the interior of the island for new discoveries"]).
+choices(5, [ "Explore the interior of the island for new discoveries", "Continue improving your cabin and survival skills"]).
 choices(6, ["Establish contact with cannibals", "Keep your distance and try to avoid cannibals"]).
 choices(7, ["Teach Friday your customs and habits", "Let Friday follow his traditions"]).
-choices(8, ["Continue improving your little boat", "Give up the idea of leaving the island"]).
+choices(8, ["Give up the idea of leaving the island", "Continue improving your little boat"]).
 choices(9, ["Prepare a strategy to return to homeland", "Stay on the island"]).
 choices(10, ["Embrace your newfound wealth and enjoy life in London", "Promise yourself to live new adventures"]).
 
-% Correct choices 
+% Scelte corrette che consentono il proseguimento della storia
 valid_choice(1, "Board the ship to begin the journey" ).
 valid_choice(2, "Try to escape from prison").
 valid_choice(3, "Invest your earnings in new business ventures").
@@ -48,7 +48,7 @@ valid_choice(8, "Continue improving your little boat").
 valid_choice(9, "Prepare a strategy to return to homeland").
 valid_choice(10, "Promise yourself to live new adventures").
 
-% Consequences for each choice
+% Per ogni scelta verrà mpostrata una scritta con le conseguenze
 consequence(1, "Board the ship to begin the journey" , "Deciding to embark on the adventure, I boarded the ship. The journey into the unknown began.").
 consequence(1, "Stay at home and give up the adventure", "Deciding to give up on the adventure, I stayed at home. However, the desire to explore the world always lingered in my heart.").
 consequence(2, "Try to escape from prison", "With courage, I attempted to escape from the prison. Through cleverness and determination, I managed to break free, gaining a valuable lesson in survival.").
@@ -70,18 +70,19 @@ consequence(9, "Stay on the island", "Choosing to stay on the island means losin
 consequence(10, "Embrace your newfound wealth and enjoy life in London", "Back in London, you embrace your newfound wealth with gratitude. Enjoy a comfortable and quiet life, but this dampens your adventurous spirit.").
 consequence(10, "Promise yourself to live new adventures", "Deciding to live new adventures, you continue your quest for knowledge and adventure. The future unfolds before you with endless possibilities. Congratulations! You have completed the game.").
 
-% Definition of puzzles 
+% Puzzle da risolvere 
 puzzle(3, "The Authenticity of the Story: ", "Is the story based on real events?.", "Yes").
 puzzle(7, "Answer Friday's questions: ", "Friday poses questions about your life on the island. Reflect on the most challenging aspect of your early days in solitude and how you overcame it. The answer is a single word", "Faith").
 puzzle(5, "The Famous Parrot: ", "In the story, what is the name of the famous parrot that accompanies the protagonist on the deserted island?", "Poll").
 
-% Predicate to manage user choice and consequences
+% discotiguos è utile per fare caoire che start_game potrebbe essere definito in modo non contiguo nel codice
 :- discontiguous start_game/0.
+% dynamic serve per dire che ha una dichiarazione dinamica e varia durante l'esecuzione del programma
 :- dynamic current_step/1.
-% Inventory
 :- dynamic inventory/1.
 inventory([]).
 current_step(1).
+
 % Inizializza lo stato del gioco
 start_game :-
     write('Welcome to the Adventure of Robinson Crusoe!'), nl, 
@@ -94,6 +95,7 @@ start_game :-
     asserta(inventory([])),
     make_choice.
 
+
 % Logica principale per la gestione delle scelte
 make_choice :-
     repeat,
@@ -101,7 +103,8 @@ make_choice :-
     display_options,
     read_user_input(UserInput),
     process_user_input(UserInput),
-    (current_step(11) ; fail). % Stop looping if the game is completed
+    check_game_completion,
+    (current_step(11) ; fail). % Gestione di uscita dal gioco
 
 
 % Visualizza lo stato corrente
@@ -132,7 +135,7 @@ process_user_input(UserInput) :-
         write('Invalid input! Choose a valid option.'), nl
     ).
 
-
+% per fare vedere le opzioni
 display_options_and_continue :-
     write('Choose your next step:'), nl,
     write(" "), nl,
@@ -162,7 +165,7 @@ process_choice(CurrentStep, UserChoice) :-
         restart_game
     ).
 
-% Avanza allo step successivo
+% gestisce gli steps successivi
 advance_step :-
     current_step(CurrentStep),
     NextStep is CurrentStep + 1,
@@ -171,9 +174,10 @@ advance_step :-
 
 % Controlla se il gioco è completato
 check_game_completion :-
-    current_step(10),
+    current_step(11),
     write('Thank you for playing the Adventure of Robinson Crusoe! Feel free to play again and explore different paths in the story.'), nl, !.
 
+% controlla che la risposta dei puzzle sia corretta
 check_puzzle_answer(UserAnswer, Solution) :-
     nonvar(UserAnswer),
     atom_string(UserAnswer, UserAnswerString),
@@ -189,19 +193,20 @@ check_puzzle_answer(UserAnswer, Solution) :-
 
 
 
-% Aggiunge un elemento all'inventario
+% se le risposte dei puzzle sono corretti allora aggiunge un elemento all'inventario
 add_to_inventory(Item) :-
     inventory(Inventory),
     append(Inventory, [Item], NewInventory),
     retractall(inventory(_)),
     asserta(inventory(NewInventory)).
 
+% mostra quanti pezzi ha guagnato l'utente
 display_inventory_progress :-
     inventory(Inventory),
     length(Inventory, Pieces),
     write('Inventory Progress: '), write(Pieces), write('/2 pieces collected.'), nl.
     
-
+% controllo dei pezzi
 check_inventory_progress :-
     inventory(Inventory),
     length(Inventory, Pieces),
@@ -211,9 +216,9 @@ check_inventory_progress :-
         true
     ).
 
+% sblocca la bibbia
 unlock_special_item :-
     write('You unlocked a special item: Bible! This item may be useful in your journey.'), nl.
-
 
 
 % Ricomincia il gioco

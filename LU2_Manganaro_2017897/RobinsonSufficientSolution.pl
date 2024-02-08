@@ -1,23 +1,21 @@
-% Initial game state
-:- dynamic current_step/1.
-current_step(1).
+% Elenco degli steps inviduati nel racconto
+step(1, "Escape, sea voyage").
+step(2, "Captured by a Turkish pirate, imprisoned").
+step(3, "Prosperity in Brazil, purchase of plantations").
+step(4, "Shipwreck on a Desert Island").
+step(5, "Lonely Life, Survival Skills").
+step(6, "The discovery of the cannibals").
+step(7, "Meeting Friday").
+step(8, "Failed departure attempt with a small boat").
+step(9, "Escape from the island").
+step(10, "Return to my homeland").
+step(11, "The end.").
 
-% Story steps 
-step(1,"Escape, sea voyage").
-step(2,"Captured by a Turkish pirate, imprisoned").
-step(3,"Prosperity in Brazil, purchase of plantations").
-step(4,"Shipwreck on a Desert Island").
-step(5,"Lonely Life, Survival Skills").
-step(6,"The discovery of the cannibals").
-step(7,"Meeting Friday").
-step(8,"Failed departure attempt with a small boat").
-step(9,"Escape from the island").
-step(10,"Return to my homeland").
 
-% Add the description of the story
+% Descrizione della storia di Robinson Crusoe
 story_detail(1, "Escape, sea voyage", "At the age of 19, I decided to leave the house in search of sea adventures.").
 story_detail(2, "Captured by a Turkish pirate, imprisonment", "After an initial shipwreck, I was captured by a Turkish pirate.").
-story_detail(3, "Prosperity in Brazil, buying plantations", "In Brazil I bought a plantation and prospered as a farmer.").
+story_detail(3, "Prosperity in Brazil, buying plantations", "In Brazil, I bought a plantation and prospered as a farmer.").
 story_detail(4, "Shipwreck on a Desert Island", "While traveling to Guinea to purchase slaves for the company, the ship was wrecked on a desert island.").
 story_detail(5, "Solitary life, survival skills", "I began a solitary life, building a hut, cultivating the land, raising animals and learning to cook with the island's limited resources.").
 story_detail(6, "The discovery of the cannibals", "After many years, I discovered the presence of cannibals on the island.").
@@ -26,31 +24,31 @@ story_detail(8, "Failed attempt to leave with a small boat", "I wanted to leave 
 story_detail(9, "Escape from the island", "Finally, I manage to have a ship sufficient enough to make the journey and return home.").
 story_detail(10, "Return to my homeland", "Back in London, I discovered that I had become rich thanks to the proceeds of the plantation in Brazil.").
 
-% Choices
+% Scelte che l'utente può fare
 choices(1, ["Board the ship to begin the journey", "Stay at home and give up the adventure"]).
-choices(2, ["Try to escape from prison", "Accept your fate as a prisoner"]).
+choices(2, ["Accept your fate as a prisoner", "Try to escape from prison"]).
 choices(3, ["Invest your earnings in new business ventures", "Live a peaceful life with your plantation"]).
 choices(4, ["Explore the island for resources", "Try to build a boat to leave the island"]).
-choices(5, ["Continue improving your cabin and survival skills", "Explore the interior of the island for new discoveries"]).
+choices(5, [ "Explore the interior of the island for new discoveries", "Continue improving your cabin and survival skills"]).
 choices(6, ["Establish contact with cannibals", "Keep your distance and try to avoid cannibals"]).
 choices(7, ["Teach Friday your customs and habits", "Let Friday follow his traditions"]).
-choices(8, ["Continue improving your little boat", "Give up the idea of leaving the island"]).
+choices(8, ["Give up the idea of leaving the island", "Continue improving your little boat"]).
 choices(9, ["Prepare a strategy to return to homeland", "Stay on the island"]).
-choices(10, ["Embrace your newfound wealth and enjoy life in London", "Promise yourself to live new adventures or explore other worlds"]).
+choices(10, ["Embrace your newfound wealth and enjoy life in London", "Promise yourself to live new adventures"]).
 
-% Correct choices 
+% Scelte corrette che consentono il proseguimento della storia
 valid_choice(1, "Board the ship to begin the journey" ).
 valid_choice(2, "Try to escape from prison").
 valid_choice(3, "Invest your earnings in new business ventures").
-valid_choice(4,"Explore the island for resources").
+valid_choice(4, "Explore the island for resources").
 valid_choice(5, "Continue improving your cabin and survival skills").
 valid_choice(6, "Establish contact with cannibals").
 valid_choice(7, "Teach Friday your customs and habits").
 valid_choice(8, "Continue improving your little boat").
 valid_choice(9, "Prepare a strategy to return to homeland").
-valid_choice(10, "Promise yourself to live new adventures or explore other worlds").
+valid_choice(10, "Promise yourself to live new adventures").
 
-% Consequences for each choice
+% Per ogni scelta verrà mpostrata una scritta con le conseguenze
 consequence(1, "Board the ship to begin the journey" , "Deciding to embark on the adventure, I boarded the ship. The journey into the unknown began.").
 consequence(1, "Stay at home and give up the adventure", "Deciding to give up on the adventure, I stayed at home. However, the desire to explore the world always lingered in my heart.").
 consequence(2, "Try to escape from prison", "With courage, I attempted to escape from the prison. Through cleverness and determination, I managed to break free, gaining a valuable lesson in survival.").
@@ -61,7 +59,7 @@ consequence(4, "Explore the island for resources", "I explored the island in sea
 consequence(4, "Try to build a boat to leave the island", "I decided to build a boat to leave the island. Lacking enough resources, the boat turned out to be a complete disaster.").
 consequence(5, "Continue improving your cabin and survival skills", "I focused my efforts on improving my hut and survival skills. This ensured my comfort and well-being on the island.").
 consequence(5, "Explore the interior of the island for new discoveries", "I expanded my explorations. I found new creatures that enriched my experience on the island, but it also exposed me to great dangers.").
-consequence(6, "Establish contact with the cannibals", "I approached the cannibals with a spirit of peace. I saved a native, Friday, and started a relationship that turned into a friendship and a lesson in cross-cultural understanding.").
+consequence(6, "Establish contact with cannibals", "I approached the cannibals with a spirit of peace. I saved a native, Friday, and started a relationship that turned into a friendship and a lesson in cross-cultural understanding.").
 consequence(6, "Keep your distance and try to avoid the cannibals", "I chose to avoid the cannibals, trying to stay hidden. This distance maintenance ensured my safety, but I missed an opportunity.").
 consequence(7, "Teach Friday your customs and habits", "I decided to teach Friday my customs. Through this teaching, Friday became a loyal companion, and we learned from each other.").
 consequence(7, "Let Friday follow his traditions", "I respected Friday's traditions and let him follow his own path. However, this did not help me in trying to escape from the island.").
@@ -70,74 +68,95 @@ consequence(8, "Give up the idea of leaving the island", "I decided to abandon t
 consequence(9, "Prepare a strategy to return to homeland", "Deciding to prepare a strategy opens up new hopes for escape.").
 consequence(9, "Stay on the island", "Choosing to stay on the island means losing the opportunity to escape.").
 consequence(10, "Embrace your newfound wealth and enjoy life in London", "Back in London, you embrace your newfound wealth with gratitude. Enjoy a comfortable and quiet life, but this dampens your adventurous spirit.").
-consequence(10, "Promise yourself to live new adventures or explore other worlds", "Deciding to live new adventures or explore other worlds, you continue your quest for knowledge and adventure. The future unfolds before you with endless possibilities.").
-
-% Definition of puzzles 
-puzzle(3, "The Authenticity of the Story: ", "Is the story based on real events? If so, write the name of the sailor Daniel Defoe drew inspiration from to create the character Robinson Crusoe; if not, write 'no'.", "Alexander Selkirk").
-puzzle(7, "Answer Friday's questions: ", "Friday poses questions about your life on the island. Reflect on the most challenging aspect of your early days in solitude and how you overcame it. The answer is a single word", "Faith").
-puzzle(5, "The Famous Parrot: ", "In the story, what is the name of the famous parrot that accompanies the protagonist on the deserted island?", "Poll").
+consequence(10, "Promise yourself to live new adventures", "Deciding to live new adventures, you continue your quest for knowledge and adventure. The future unfolds before you with endless possibilities. Congratulations! You have completed the game.").
 
 
-% Predicate to manage user choice and consequences
+% discotiguos è utile per fare caoire che start_game potrebbe essere definito in modo non contiguo nel codice
 :- discontiguous start_game/0.
+% dynamic serve per dire che ha una dichiarazione dinamica e varia durante l'esecuzione del programma
+:- dynamic current_step/1.
+current_step(1).
+
+% Inizializza lo stato del gioco
+start_game :-
+    write('Welcome to the Adventure of Robinson Crusoe!'), nl, 
+    write('Robinson Crusoe, a young Englishman, decides to defy his father''s will and sets out on a sea voyage against his advice.'), nl,  
+    write('In this game, you will be Robinson and must make the right decisions to save yourself.'), nl,
+    write(' '), nl, 
+    retractall(current_step(_)),
+    asserta(current_step(1)),
+    make_choice.
+
+% Logica principale per la gestione delle scelte
 make_choice :-
-    provide_story_details,
+    repeat,
+    display_current_step,
+    display_options,
+    read_user_input(UserInput),
+    process_user_input(UserInput),
+    check_game_completion,
+    (current_step(11) ; fail). % Gestione di uscita dal gioco
+
+
+% Visualizza lo stato corrente
+display_current_step :-
+    current_step(CurrentStep),
+    story_detail(CurrentStep, StepName, StepDescription),
+    write('Current Step: '), write(CurrentStep), write(' - '), write(StepName), nl,
+    write('Description: '), write(StepDescription), nl.
+
+
+% Visualizza le opzioni disponibili
+display_options :-
     current_step(CurrentStep),
     choices(CurrentStep, Options),
-    write('Choose an option by entering 1 or 2: '), write(Options), nl,
-    read(UserInput),
+    write('Choose an option by entering the corresponding number: '), write(Options), nl.
+
+% Legge l'input dell'utente
+read_user_input(UserInput) :-
+    read(UserInput).
+
+% Processa l'input dell'utente
+process_user_input(UserInput) :-
+    current_step(CurrentStep),
+    choices(CurrentStep, Options),
     (integer(UserInput), nth1(UserInput, Options, UserChoice) ->
-        consequence(CurrentStep, UserChoice, Consequence),
-        write(Consequence), nl,
-        (valid_choice(CurrentStep, UserChoice) ->
-            (puzzle(CurrentStep, PuzzlePrompt, Feedback, Solution) ->
-                write('Puzzle: '), write(PuzzlePrompt), write(Feedback), nl,
-                read(UserAnswer),
-                check_puzzle_answer(UserAnswer, Solution),
-                advance_step;
-                advance_step
-            ),
-            (CurrentStep == 10 ->
-                write('Congratulations! You have reached the end of the story.'), nl, !;
-                make_choice
-            );
-            write('Wrong choice! Go back to step 1.'), nl, retractall(current_step(_)), asserta(current_step(1)), fail
-        );
-        write('Invalid choice! Restart.'), nl, retractall(current_step(_)), asserta(current_step(1)), fail
+        process_choice(CurrentStep, UserChoice)
+    ;
+        write('Invalid input! Choose a valid option.'), nl
     ).
 
+% per fare vedere le opzioni
+display_options_and_continue :-
+    write('Choose your next step:'), nl,
+    write(" "), nl,
+    advance_step.
+
+% Processa la scelta dell'utente
+process_choice(CurrentStep, UserChoice) :-
+    consequence(CurrentStep, UserChoice, Consequence),
+    write(Consequence), nl,
+    (valid_choice(CurrentStep, UserChoice) ->
+        display_options_and_continue
+    ;
+        write('Invalid choice! Restart.'), nl, 
+        restart_game
+    ).
+
+% gestisce gli steps successivi
 advance_step :-
     current_step(CurrentStep),
     NextStep is CurrentStep + 1,
     retractall(current_step(_)),
     asserta(current_step(NextStep)).
 
-check_puzzle_answer(UserAnswer, Solution) :-
-    downcase_atom(UserAnswer, LowerUserAnswer),
-    downcase_atom(Solution, LowerSolution),
-    (LowerUserAnswer == LowerSolution ->
-        write('Correct! You unlocked hidden resources.'), nl;
-        write('Incorrect! '), write('Correct answer: '), write(Solution), nl
-    ).
-
-    
-% Start_game is useful for defining the starting point of the story
-start_game :-
-    write('Welcome to the Adventure of Robinson Crusoe!'), nl, 
-    write('Robinson Crusoe, a young Englishman, decides to defy his father''s will and sets out on a sea voyage against his advice.'),nl,  
-    write('In this game, you will be Robinson and must make the right decisions to save yourself.'), nl,
-    write(' '), nl, 
-        repeat,
-        make_choice,
-        (start, nl;
-        end, nl).
+% Controlla se il gioco è completato
+check_game_completion :-
+    current_step(11),
+    write('Thank you for playing the Adventure of Robinson Crusoe! Feel free to play again and explore different paths in the story.'), nl, !.
 
 
-:- dynamic provide_story_details/0.
-    provide_story_details :-
-        current_step(CurrentStep),
-        story_detail(CurrentStep, _, Description),
-        write(Description), nl.
-    
-% Run the game
-start_game.
+% Ricomincia il gioco
+restart_game :-
+    retractall(current_step(_)),
+    asserta(current_step(1)).
