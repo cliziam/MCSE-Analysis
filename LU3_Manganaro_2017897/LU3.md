@@ -2,13 +2,7 @@
 [App Link](https://studio.code.org/projects/applab/GqLGFKSLqW4d6yFarzzGC31aBcspnpFWGP0KhItHgRM)
 
 ### Description of the Learning Unit:
-This learning unit focuses on the analytic geometry of the plane, providing students with the opportunity to graphically explore linear, circular, parabolic, and elliptical functions. It consists of two main sections within the app:
-
-### Levels
-Develop an application with levels (from first to fourth) where specific data is presented, and the user must input the corresponding correct equation. This gradual approach allows students to become familiar with different types of equations and their graphical representations.
-
-### Custom Value Input
-Implement a section that allows users to input the values of coefficients (a, b, c) to correctly generate the equation of the desired function. This approach enables students to explore in a more dynamic and interactive manner, allowing them to experiment with different parameters and observe how they influence the shape and position of the function in the Cartesian plane.
+This learning unit focuses on the analytic geometry of the plane, providing students with the opportunity to graphically explore linear, circular, parabolic, and elliptical functions. 
 
 
 ### [Optimal Solution](https://studio.code.org/projects/applab/GqLGFKSLqW4d6yFarzzGC31aBcspnpFWGP0KhItHgRM) (10/10) 

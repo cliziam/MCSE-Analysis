@@ -72,8 +72,8 @@ consequence(10, "Promise yourself to live new adventures", "Deciding to live new
 
 % Puzzle da risolvere 
 puzzle(3, "The Authenticity of the Story: ", "Is the story based on real events?.", "Yes").
-puzzle(7, "Answer Friday's questions: ", "Friday poses questions about your life on the island. Reflect on the most challenging aspect of your early days in solitude and how you overcame it. The answer is a single word", "Faith").
-puzzle(5, "The Famous Parrot: ", "In the story, what is the name of the famous parrot that accompanies the protagonist on the deserted island?", "Poll").
+puzzle(7, "Answer Friday's questions: ", "Friday poses questions about your life on the island. Reflect on the most challenging aspect of your early days in solitude and how you overcame it. The answer is a single word", "faith").
+puzzle(5, "The Famous Parrot: ", "In the story, what is the name of the famous parrot that accompanies the protagonist on the deserted island?", "poll").
 
 % discotiguos è utile per fare caoire che start_game potrebbe essere definito in modo non contiguo nel codice
 :- discontiguous start_game/0.
@@ -141,14 +141,23 @@ display_options_and_continue :-
     write(" "), nl,
     advance_step.
 
+% gestisce gli steps successivi
+advance_step :-
+    current_step(CurrentStep),
+    (inventory_contains(bible) -> NextStep is 9 ; NextStep is CurrentStep + 1),
+    retractall(current_step(_)),
+    asserta(current_step(NextStep)).
+
 % Processa la scelta dell'utente
 process_choice(CurrentStep, UserChoice) :-
     consequence(CurrentStep, UserChoice, Consequence),
     write(Consequence), nl,
     (valid_choice(CurrentStep, UserChoice) ->
         (puzzle(CurrentStep, PuzzlePrompt, Feedback, Solution) ->
-            write('ALT!! Put yourself to the test! (write the answer in lowercase): '), nl,
+            write('----------------------------------------------------------------------------- '), nl,
+            write('           ALT!! Put yourself to the test! (write the answer in lowercase):   '), nl,
             write(PuzzlePrompt),nl, 
+            write('----------------------------------------------------------------------------- '), nl,
             write(Feedback), nl,
             read(UserAnswer),
             check_puzzle_answer(UserAnswer, Solution),
@@ -164,13 +173,6 @@ process_choice(CurrentStep, UserChoice) :-
         write('Invalid choice! Restart.'), nl, 
         restart_game
     ).
-
-% gestisce gli steps successivi
-advance_step :-
-    current_step(CurrentStep),
-    NextStep is CurrentStep + 1,
-    retractall(current_step(_)),
-    asserta(current_step(NextStep)).
 
 % Controlla se il gioco è completato
 check_game_completion :-
@@ -200,6 +202,14 @@ add_to_inventory(Item) :-
     retractall(inventory(_)),
     asserta(inventory(NewInventory)).
 
+
+% Verifica se un elemento è presente nell'inventario
+inventory_contains(Item) :-
+    inventory(Inventory),
+    member(Item, Inventory).
+
+
+
 % mostra quanti pezzi ha guagnato l'utente
 display_inventory_progress :-
     inventory(Inventory),
@@ -218,7 +228,12 @@ check_inventory_progress :-
 
 % sblocca la bibbia
 unlock_special_item :-
-    write('You unlocked a special item: Bible! This item may be useful in your journey.'), nl.
+    write('------------------------------------------------------------------------------------------------------'), nl,
+    write('                                          You unlocked the Bible!                                      '), nl,
+    write('                    You decide to consult the Bible for guidance on your journey.                      '), nl,
+    write('               With newfound wisdom, you skip ahead to step 9: Escape from the island'                  ), nl,
+    write('-------------------------------------------------------------------------------------------------------'), nl,
+    add_to_inventory(bible).
 
 
 % Ricomincia il gioco
@@ -227,3 +242,4 @@ restart_game :-
     asserta(current_step(1)),
     retractall(inventory(_)),
     asserta(inventory([])).
+
