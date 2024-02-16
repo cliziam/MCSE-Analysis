@@ -5,6 +5,20 @@
 This learning unit focuses on the analytic geometry of the plane, providing students with the opportunity to graphically explore linear, circular, parabolic, and elliptical functions. 
 
 
+https://studio.code.org/projects/applab/beYVDr9uKtXtTaBnmKEzlzA37-Es36MK1RjcrjZ6BjE
+
+retta
+y=2x+4
+
+circonferenza: 
+x^2 + y^2 = 4
+
+parabola:
+y = 2x^2     y=x^2+5x+23
+
+Ellisse:
+ x^2/25 + y^2/9 = 1
+
 ### [Optimal Solution](https://studio.code.org/projects/applab/GqLGFKSLqW4d6yFarzzGC31aBcspnpFWGP0KhItHgRM) (10/10) 
 ```javascript
     setActiveCanvas("graphic");
