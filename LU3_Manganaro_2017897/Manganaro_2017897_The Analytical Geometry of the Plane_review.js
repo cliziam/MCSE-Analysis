@@ -26,7 +26,6 @@ function drawAxes() {
 
 // Livello 1: retta
 function isLinearFunction(equation) {
-    // Patterns for different forms of linear equations
     var linePatterns = [
         /^\s*(y\s*=\s*[+-]?\s*\d*\s*\*\s*x\s*[+-]?\s*\d+|x\s*=\s*[+-]?\s*\d+|y\s*=\s*[+-]?\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*x|y\s*=\s*x\s*[+-]?\s*\d+)\s*$/,
         /^\s*(y\s*=\s*[+-]?\s*\d*\s*\*\s*x\s*[+-]?\s*\d+|x\s*=\s*[+-]?\s*\d+|y\s*=\s*[+-]?\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*x|y\s*=\s*x)\s*$/,
@@ -62,8 +61,7 @@ function drawLinearFunction(equation) {
 }
 
 
-//livello 2: cerchio
-
+//Livello 2: Cerchio
 function isCircleFunction(equation) {
     // Controlla se l'equazione è  x^2+y^2=4, y^2+x^2=4, x^2+y^2-4=0 o y^2+x^2-4=0
     var pattern = /^(x\^2\+y\^2=4)$|^(y\^2\+x\^2=4)$|^(x\^2\+y\^2-4=0)$|^(y\^2\+x\^2-4=0)$/;
@@ -75,15 +73,14 @@ function isCircle(equation) {
 
     var pattern = /^([-+]?\d*)?x\^2([-+]?\d*)?y\^2([-+]?\d*)?[xy]?([-+]?\d+)?=([-+]?\d+)$/;
     if (pattern.test(equation)) {
-      // Check if coefficients of x^2 and y^2 terms are equal
       var match = equation.match(pattern);
-      var coefficient_x2 = parseInt(match[1]) || 1; // Default coefficient is 1 if not specified
-      var coefficient_y2 = parseInt(match[2]) || 1; // Default coefficient is 1 if not specified
+      var coefficient_x2 = parseInt(match[1]) || 1; 
+      var coefficient_y2 = parseInt(match[2]) || 1; 
       if (coefficient_x2 === coefficient_y2) {
-        return true; // It's a circle
+        return true; 
       }
     }
-    return false; // It's not a circle
+    return false; 
   }
 }
 
@@ -91,23 +88,20 @@ function isCircle(equation) {
 function extractCircleABC(equation){
   var pattern = /^(\d*)x\^2\+?(\d*)y\^2=(\d+)$/;
   var matches = equation.match(pattern);
-
-  var a = matches[1] ? parseInt(matches[1]) : 1; // If matches[1] exists, parse the integer value, else set a to 1
-  var b = matches[2] ? parseInt(matches[2]) : 1; // If matches[2] exists, parse the integer value, else set b to 1
-  var c = parseInt(matches[3]); // Constant term
+  var a = matches[1] ? parseInt(matches[1]) : 1; 
+  var b = matches[2] ? parseInt(matches[2]) : 1; 
+  var c = parseInt(matches[3]); 
   a=parseInt(a);
   b=parseInt(b);
   drawCircle2(a,b, c);
 }
 
 function drawCircle2(a, b, c) {
-
   var centerX = width / 2 + a;
   var centerY = height / 2 - b; 
   var radius = Math.sqrt(c / (a + b));
   var step = Math.PI / 180; 
   var scaleFactor = 20; 
-    
   for (var angle = 0; angle <= 2 * Math.PI; angle += step) {
       var x = centerX + radius * Math.cos(angle) * scaleFactor;
       var y = centerY + radius * Math.sin(angle) * scaleFactor;
@@ -116,15 +110,13 @@ function drawCircle2(a, b, c) {
 }
 
 function drawCircle(a, b, c) {
-
   var h = -a / 2;
   var k = -b / 2;
   var radius = Math.sqrt(h*h + k*k - c);
   var centerX = width / 2 + h;
   var centerY = height / 2 - k; 
   var step = Math.PI / 180; 
-  var scaleFactor = 20; 
-    
+  var scaleFactor = 20;   
   for (var angle = 0; angle <= 2 * Math.PI; angle += step) {
       var x = centerX + radius * Math.cos(angle) * scaleFactor;
       var y = centerY + radius * Math.sin(angle) * scaleFactor;
@@ -134,8 +126,7 @@ function drawCircle(a, b, c) {
 
 
 
-// Livello 3: parabola
-
+// Livello 3: Parabola
 function isParabolaFunction(equation) {
     var parabolaPattern = /^y\s*=\s*2\s*(\*\s*)?x\s*\^\s*2\s*$/i;
     return  parabolaPattern.test(equation);
@@ -144,7 +135,6 @@ function isParabolaFunction(equation) {
 
 function isParab(funcString) {
   if(!isParabolaFunction(funcString)){
-    // Define the regular expression to check if the string matches the format of a parabola equation
     var parabolaPattern = /^y\s*=\s*-?\d*\s*(\*\s*)?x\s*\^\s*2\s*([+-]\s*\d*\s*)?x?\s*([+-]\s*\d+(\.\d+)?)?$/i;
     var test=parabolaPattern.test(funcString);
     console.log("è una parabola? "+ test);
@@ -156,12 +146,10 @@ function isParab(funcString) {
 function drawParabolaFunction(equation) {
   var parabolaPattern = /^y\s*=\s*(-?\d*\.*\d*)\s*(\*\s*)?x\s*\^\s*2\s*([+-]\s*\d*\.*\d*)?\s*x\s*([+-]\s*\d+(\.\d+)?)?$/i;
   var match = equation.match(parabolaPattern);
-  
   if (match === null) {
       console.log('Invalid equation');
       return;
   }
-  
   var a = parseFloat(match[1] || '1');
   var b = parseFloat(match[3] || '0');
   var c = parseFloat(match[5] || '0');
@@ -196,24 +184,11 @@ function drawParabolaFunc(equation) {
   }
 }
 
-function drawParabola(a, b, c) {
-  var range = 10;
-  var scaleFactor = Math.min(width, height) / (2 * range);
-  for (var x = -range; x <= range; x += 0.1) {
-      var y = a * Math.pow(x, 2) + b * x + c;
-      var plotX = width / 2 + x * scaleFactor;
-      var plotY = height / 2 - y * scaleFactor;
-      rect(plotX, plotY, 1, 1);
-  }
-}
-
-// Livello 4: ellisse
+// Livello 4: Ellisse
 function isEllipseFunction(equation) {
   var ellipsePattern = /\(x\s*\^\s*2\s*\/\s*25\)\s*\+\s*\(y\s*\^\s*2\s*\/\s*9\)\s*=\s*1/;
   var ellipsePattern2 = /\s*x\s*\^\s*2\s*\/\s*25\s*\+\s*y\s*\^\s*2\s*\/\s*9\s*=\s*1/;
-
   console.log("L'equazione è " + equation);
-
   var isEllisse = ellipsePattern.test(equation) || ellipsePattern2.test(equation);
   return isEllisse;
 }
@@ -273,7 +248,6 @@ function drawEllipseFunction(equation) {
         rect(plotX2, plotY2, 1, 1);
     }
 }
-
 
 
 onEvent("equal", "click", function() {
@@ -414,7 +388,6 @@ onEvent("draw", "click", function( ) {
         }
   }
   else if(count==2){
-
       if (!isNaN(a) && !isNaN(b) && !isNaN(c)) {
         var h = -a / 2;
         var k = -b / 2;
