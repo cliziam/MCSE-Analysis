@@ -24,22 +24,25 @@ function drawAxes() {
 }
 
 
-//livello 1: retta
+// Livello 1: retta
 function isLinearFunction(equation) {
-    var linePattern = /^\s*(y\s*=\s*[+-]?\s*\d*\s*\*\s*x\s*[+-]?\s*\d+|x\s*=\s*[+-]?\s*\d+|y\s*=\s*[+-]?\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*x|y\s*=\s*x\s*[+-]?\s*\d+)\s*$/;
-    var linePattern2 = /^\s*(y\s*=\s*[+-]?\s*\d*\s*\*\s*x\s*[+-]?\s*\d+|x\s*=\s*[+-]?\s*\d+|y\s*=\s*[+-]?\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*x|y\s*=\s*x)\s*$/;
-    var linePattern3= /^\s*(y\s*=\s*[+-]?\s*\d+(\.\d+)?\s*\*\s*x\s*[+-]?\s*\d+(\.\d+)?|x\s*=\s*[+-]?\s*\d+(\.\d+)?|y\s*=\s*[+-]?\s*\d+(\.\d+)?\s*\*\s*x|y\s*=[+-]?\s*\d+(\.\d+)?\s*\+\s*\d+(\.\d+)?\s*\*\s*x|y\s*=[+-]?\s*\d+(\.\d+)?\s*\+\s*x|y\s*=\s*x\s*[+-]?\s*\d+(\.\d+)?)\s*$/;
-    var linePattern4 = /^\s*(y\s*=\s*[+-]?\s*\d+x\s*[+-]?\s*\d+|x\s*=\s*[+-]?\s*\d+|y\s*=\s*[+-]?\s*\d+x|y\s*=[+-]?\s*\d+\s*\+\s*\d+x|y\s*=[+-]?\s*\d+\s*\+\s*x|y\s*=\s*x)\s*$/;
-    var linePattern5 = /^\s*(y\s*=\s*-x)\s*$/;
-    var linePattern6 = /^\s*(y\s*=\s*-x\s*[+-]\s*\d+)\s*$/;
+    // Patterns for different forms of linear equations
+    var linePatterns = [
+        /^\s*(y\s*=\s*[+-]?\s*\d*\s*\*\s*x\s*[+-]?\s*\d+|x\s*=\s*[+-]?\s*\d+|y\s*=\s*[+-]?\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*x|y\s*=\s*x\s*[+-]?\s*\d+)\s*$/,
+        /^\s*(y\s*=\s*[+-]?\s*\d*\s*\*\s*x\s*[+-]?\s*\d+|x\s*=\s*[+-]?\s*\d+|y\s*=\s*[+-]?\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*x|y\s*=\s*x)\s*$/,
+        /^\s*(y\s*=\s*[+-]?\s*\d+(\.\d+)?\s*\*\s*x\s*[+-]?\s*\d+(\.\d+)?|x\s*=\s*[+-]?\s*\d+(\.\d+)?|y\s*=\s*[+-]?\s*\d+(\.\d+)?\s*\*\s*x|y\s*=[+-]?\s*\d+(\.\d+)?\s*\+\s*\d+(\.\d+)?\s*\*\s*x|y\s*=[+-]?\s*\d+(\.\d+)?\s*\+\s*x|y\s*=\s*x\s*[+-]?\s*\d+(\.\d+)?)\s*$/,
+        /^\s*(y\s*=\s*[+-]?\s*\d+x\s*[+-]?\s*\d+|x\s*=\s*[+-]?\s*\d+|y\s*=\s*[+-]?\s*\d+x|y\s*=[+-]?\s*\d+\s*\+\s*\d+x|y\s*=[+-]?\s*\d+\s*\+\s*x|y\s*=\s*x)\s*$/,
+        /^\s*(y\s*=\s*-x)\s*$/,
+        /^\s*(y\s*=\s*-x\s*[+-]\s*\d+)\s*$/
+    ];
 
-    if (linePattern.test(equation) || linePattern2.test(equation) || linePattern3.test(equation) || linePattern4.test(equation) || linePattern5.test(equation) || linePattern6.test(equation)) {
-        return true;
-    } else {
-        return false;
+    for (var i = 0; i < linePatterns.length; i++) {
+        if (linePatterns[i].test(equation)) {
+            return true;
+        }
     }
+    return false;
 }
-
 
 function drawLinearFunction(equation) {
   equation = equation.replace(/(\d)([a-zA-Z])/g, "$1 * $2");
@@ -52,16 +55,16 @@ function drawLinearFunction(equation) {
       return;
   }
 
-  for (var i = 0; i < width; i++) {
-      rect(i, height / 2 - f((i - width / 2) / 10) * 10, 1, 1);
-  }
+   for (var i = 0; i < width; i++) {
+        var y = height / 2 - f((i - width / 2) / 10) * 10;
+        line(i, y, i+1, height / 2 - f(((i+1) - width / 2) / 10) * 10);
+    }
 }
 
 
 //livello 2: cerchio
 
 function isCircleFunction(equation) {
-    equation = equation.replace(/\s/g, '');
     // Controlla se l'equazione è  x^2+y^2=4, y^2+x^2=4, x^2+y^2-4=0 o y^2+x^2-4=0
     var pattern = /^(x\^2\+y\^2=4)$|^(y\^2\+x\^2=4)$|^(x\^2\+y\^2-4=0)$|^(y\^2\+x\^2-4=0)$/;
     return pattern.test(equation);
@@ -131,7 +134,7 @@ function drawCircle(a, b, c) {
 
 
 
-//livello 3: parabola
+// Livello 3: parabola
 
 function isParabolaFunction(equation) {
     var parabolaPattern = /^y\s*=\s*2\s*(\*\s*)?x\s*\^\s*2\s*$/i;
@@ -148,8 +151,6 @@ function isParab(funcString) {
     return test;
   }
 }
-
-
 
 
 function drawParabolaFunction(equation) {
@@ -206,8 +207,7 @@ function drawParabola(a, b, c) {
   }
 }
 
-//livello 4: ellisse
-
+// Livello 4: ellisse
 function isEllipseFunction(equation) {
   var ellipsePattern = /\(x\s*\^\s*2\s*\/\s*25\)\s*\+\s*\(y\s*\^\s*2\s*\/\s*9\)\s*=\s*1/;
   var ellipsePattern2 = /\s*x\s*\^\s*2\s*\/\s*25\s*\+\s*y\s*\^\s*2\s*\/\s*9\s*=\s*1/;
