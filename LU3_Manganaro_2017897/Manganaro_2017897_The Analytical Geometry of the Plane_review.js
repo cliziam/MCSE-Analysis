@@ -3,10 +3,19 @@ var height = getProperty("graphic", "height");
 var arrowSize = 10;
 var arrowOffset = 5;
 var count=1;
-
 setActiveCanvas("graphic");
 setScreen("SpiegazioneLivello");
 drawAxes();
+hideElement("infosection");
+
+function show(){
+  showElement("infosection");
+  showElement("info1");
+  showElement("info2");
+  setText("info1", " ");
+  setText("info2", " ");
+}
+
 
 var levels = {"1": "line",
               "2": "circle",
@@ -24,7 +33,7 @@ function drawAxes() {
 }
 
 
-// Livello 1: retta
+// Livello 1: Retta
 function isLinearFunction(equation) {
     var linePatterns = [
         /^\s*(y\s*=\s*[+-]?\s*\d*\s*\*\s*x\s*[+-]?\s*\d+|x\s*=\s*[+-]?\s*\d+|y\s*=\s*[+-]?\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*\d*\s*\*\s*x|y\s*=[+-]?\s*\d*\s*\+\s*x|y\s*=\s*x\s*[+-]?\s*\d+)\s*$/,
@@ -71,16 +80,16 @@ function isCircleFunction(equation) {
 function isCircle(equation) {
   if (!isCircleFunction(equation)) {
 
-    var pattern = /^([-+]?\d*)?x\^2([-+]?\d*)?y\^2([-+]?\d*)?[xy]?([-+]?\d+)?=([-+]?\d+)$/;
-    if (pattern.test(equation)) {
-      var match = equation.match(pattern);
-      var coefficient_x2 = parseInt(match[1]) || 1; 
-      var coefficient_y2 = parseInt(match[2]) || 1; 
-      if (coefficient_x2 === coefficient_y2) {
-        return true; 
-      }
+   var circlePatterns = [
+        /^(x\^2\s*\+\s*y\^2\s*=\s*\d+)$/,   // x^2 + y^2 = r^2
+        /^(y\^2\s*\+\s*x\^2\s*=\s*\d+)$/  // y^2 + x^2 = r^2
+  ];
+    for (var i = 0; i < circlePatterns.length; i++) {
+        if (circlePatterns[i].test(equation)) {
+            return true;
+        }
     }
-    return false; 
+    return false;
   }
 }
 
@@ -91,38 +100,54 @@ function extractCircleABC(equation){
   var a = matches[1] ? parseInt(matches[1]) : 1; 
   var b = matches[2] ? parseInt(matches[2]) : 1; 
   var c = parseInt(matches[3]); 
+  
+  console.log(a);
+  console.log(b);
+  console.log(c);
   a=parseInt(a);
   b=parseInt(b);
-  drawCircle2(a,b, c);
+  return a, b, c;
 }
 
-function drawCircle2(a, b, c) {
-  var centerX = width / 2 + a;
-  var centerY = height / 2 - b; 
-  var radius = Math.sqrt(c / (a + b));
-  var step = Math.PI / 180; 
-  var scaleFactor = 20; 
-  for (var angle = 0; angle <= 2 * Math.PI; angle += step) {
-      var x = centerX + radius * Math.cos(angle) * scaleFactor;
-      var y = centerY + radius * Math.sin(angle) * scaleFactor;
-      rect(x, y, 1, 1);
+
+function drawCircle(a, b, c, equation, canonic){
+  var scale = Math.min(width, height) / 320; 
+  var radius;
+  var infoText;
+  var centerX;
+  var centerY;
+  if(canonic){
+    a, b, c=extractCircleABC(equation);
+    centerX = width / 2 + a * scale;
+    centerY = height / 2 - b * scale;
+    c=parseInt(c);
+    radius=Math.sqrt(c);
+    radius=radius.toFixed(2);
+    console.log(radius);
+    infoText = "C(0,0)" +"  r=" + radius;
+  }else{
+    var g = -a / 2;
+    var f = -b / 2;
+    centerX = width / 2 + g * scale;
+    centerY = height / 2 - f * scale;
+    var intermediateValue = Math.pow(g, 2) + Math.pow(f, 2) - c;
+    
+     if (intermediateValue >= 0) {
+      radius = Math.sqrt(intermediateValue);
+      radius = radius.toFixed(2);
+      infoText = "C(" + (-g) + "," + (-f) + ")   r=" + radius;
+     } else {
+      radius = 0;
+      infoText = "Invalid equation, r<0";
+      }
+
+    
   }
+  setText("info2", infoText);
+  setFillColor(rgb(255, 255, 255, 0)); 
+  circle(centerX, centerY, Math.abs(radius) * scale * 2); 
 }
 
-function drawCircle(a, b, c) {
-  var h = -a / 2;
-  var k = -b / 2;
-  var radius = Math.sqrt(h*h + k*k - c);
-  var centerX = width / 2 + h;
-  var centerY = height / 2 - k; 
-  var step = Math.PI / 180; 
-  var scaleFactor = 20;   
-  for (var angle = 0; angle <= 2 * Math.PI; angle += step) {
-      var x = centerX + radius * Math.cos(angle) * scaleFactor;
-      var y = centerY + radius * Math.sin(angle) * scaleFactor;
-      rect(x, y, 1, 1);
-  }
-}
 
 
 
@@ -142,112 +167,121 @@ function isParab(funcString) {
   }
 }
 
-
 function drawParabolaFunction(equation) {
-  var parabolaPattern = /^y\s*=\s*(-?\d*\.*\d*)\s*(\*\s*)?x\s*\^\s*2\s*([+-]\s*\d*\.*\d*)?\s*x\s*([+-]\s*\d+(\.\d+)?)?$/i;
-  var match = equation.match(parabolaPattern);
-  if (match === null) {
-      console.log('Invalid equation');
-      return;
+  var parabolaPattern;
+  var match;
+  var a, b, c;
+  if(isParabolaFunction(equation)){
+      var range = 10;
+      var scaleFactor = Math.min(width, height) / (4);
+      a=2;
+      b=0;
+      c=0;
+      var originOffsetX = width / 2;
+      var originOffsetY = height /  2 ; 
   }
-  var a = parseFloat(match[1] || '1');
-  var b = parseFloat(match[3] || '0');
-  var c = parseFloat(match[5] || '0');
-  var range = 10;
-  var scaleFactor = Math.min(width, height) / (2 * range);
+  else{
+      var range = 2;
+      var scaleFactor = Math.min(width, height) / (4);
+      parabolaPattern = /^y\s*=\s*(-?\d*\.*\d*)\s*(\*\s*)?x\s*\^\s*2\s*([+-]\s*\d*\.*\d*)?\s*x\s*([+-]\s*\d+(\.\d+)?)?$/i;
+      match = equation.match(parabolaPattern);
+      if (match === null) {
+        console.log('Invalid equation');
+        return;
+      }
+      a = parseFloat(match[1] || '1');
+      b = parseFloat(match[3] || '0');
+      c = parseFloat(match[4] || '0');
 
-  for (var x = -range; x <= range; x += 0.1) {
-      var y = a * Math.pow(x, 2) + b * x + c;
-      var plotX = width / 2 + x * scaleFactor;
-      var plotY = height / 2 - y * scaleFactor;
-      rect(plotX, plotY, 1, 1);
+      var originOffsetX = width / 2;
+      var originOffsetY = height /  2 - 150; 
   }
+
+    var h = -b / (2 * a);
+    var k = c - Math.pow(b, 2) / (4 * a);
+    var infoText = "V(" + h.toFixed(1) + "," + k.toFixed(1) + ")";
+  
+    var focusX = h;
+    var focusY = k + 1 / (4 * a);
+    var focusText = "F(" + focusX.toFixed(1) + "," + focusY.toFixed(1) + ")";
+    setText("info2", focusText+" " +infoText);
+  
+  
+    var prevX, prevY;
+    for (var x = -range; x <= range; x += 0.01) {
+      var y = a * Math.pow(x, 2) + b * x + c;
+      var canvasX = x * scaleFactor + originOffsetX;
+      var canvasY = -y * scaleFactor + originOffsetY;
+      if (prevX !== undefined && prevY !== undefined) {
+        line(prevX, prevY, canvasX, canvasY);
+      }
+      prevX = canvasX;
+      prevY = canvasY;
+    }
 }
 
-function drawParabolaFunc(equation) {
-  var parabolaPattern = /^y\s*=\s*([+-]?\s*\d+(\.\d+)?\s*)?(\*?\s*x\s*\^\s*2)?\s*([+-]\s*\d+(\.\d+)?\s*\*?\s*x)?\s*([+-]\s*\d+(\.\d+)?)?\s*$/i;
-  var match = equation.match(parabolaPattern);
-   if (match === null) {
-      console.log('Invalid equation');
-  }
-  var a = parseFloat(match[1] || '1');
-  var b = parseFloat(match[5] || '0');
-  var c = parseFloat(match[9] || '0');
-  var range = 10;
-  var scaleFactor = Math.min(width, height) / (2 * range);
-
-  for (var x = -range; x <= range; x += 0.1) {
-      var y = a * Math.pow(x, 2) + b * x + c;
-      var plotX = width / 2 + x * scaleFactor;
-      var plotY = height / 2 - y * scaleFactor;
-      rect(plotX, plotY, 1, 1);
-  }
-}
 
 // Livello 4: Ellisse
 function isEllipseFunction(equation) {
   var ellipsePattern = /\(x\s*\^\s*2\s*\/\s*25\)\s*\+\s*\(y\s*\^\s*2\s*\/\s*9\)\s*=\s*1/;
   var ellipsePattern2 = /\s*x\s*\^\s*2\s*\/\s*25\s*\+\s*y\s*\^\s*2\s*\/\s*9\s*=\s*1/;
-  console.log("L'equazione è " + equation);
+  console.log(equation);
   var isEllisse = ellipsePattern.test(equation) || ellipsePattern2.test(equation);
-  return isEllisse;
+  if (ellipsePattern2.test(equation)) {
+    equation = equation.replace(/\s*x\s*\^\s*2\s*\/\s*25\s*\+\s*y\s*\^\s*2\s*\/\s*9\s*=\s*1/, "(x^2/25) + (y^2/9) = 1");
+  }
+  return isEllisse, equation;
 }
 
 
 function isEllipse(equation) {
-  if(!isEllipseFunction(equation)){
-    var ellipsePattern = /^\s*(?:\(?\s*x\^2\s*\/\s*[0-9]+\s*\)?\s*\+\s*\(?\s*y\^2\s*\/\s*[0-9]+\s*\)?\s*=\s*[0-9]+\s*|\(?\s*y\^2\s*\/\s*[0-9]+\s*\)?\s*\+\s*\(?\s*x\^2\s*\/\s*[0-9]+\s*\)?\s*=\s*[0-9]+\s*)$/;
-    var isEllisse = ellipsePattern.test(equation);
-    console.log("Is Ellipse? " + isEllisse);
-    return isEllisse;
+ if (!isEllipseFunction(equation)) {
+      equation = equation.replace(/\s/g, '');
+      // Controlliamo se l'equazione è nel formato corretto (x^2/a^2) + (y^2/b^2) = 1
+      var ellipseRegex = /\((x\^2\/(\d+))\)\+\((y\^2\/(\d+))\)=1/;
+      var matches = equation.match(ellipseRegex);
+
+      if (matches) {
+         var aSquared = parseInt(matches[2]);
+         var bSquared = parseInt(matches[4]);
+
+         if (aSquared > 0 && bSquared > 0 && aSquared !== bSquared) {
+            return true;
+         }
+      }
+   }
+   return false;
+}
+
+function drawEllipse(a, b, equation) {
+  var scale = Math.min(width, height) / 150;
+  var centerX = width / 2;
+  var centerY = height / 2;
+  var matches = equation.match(/\((x\^2\/(\d+))\)\+\((y\^2\/(\d+))\)=1/);
+  if (matches) {
+    var aSquared = parseInt(matches[2]);
+    var bSquared = parseInt(matches[4]);
+    console.log(aSquared);
+    console.log(bSquared);
+
+    if (aSquared > 0 && bSquared > 0) {
+      var semiMajorAxis = Math.sqrt(aSquared) * scale;
+      var semiMinorAxis = Math.sqrt(bSquared) * scale;
+      for (var x = centerX - semiMajorAxis; x <= centerX + semiMajorAxis; x += 0.01) {
+        var y1 = centerY - Math.sqrt(1 - Math.pow((x - centerX) / semiMajorAxis, 2)) * semiMinorAxis;
+        var y2 = centerY + Math.sqrt(1 - Math.pow((x - centerX) / semiMajorAxis, 2)) * semiMinorAxis;
+        line(x, y1, x, y2);
+      }
+      
+      var infoText = "Semi-Major Axis: " + semiMajorAxis.toFixed(2) + ", Semi-Minor Axis: " + semiMinorAxis.toFixed(2);
+      setText("info2", infoText);
+      
+      return;
+    }
   }
+  setText("info2", "Invalid ellipse equation");
 }
 
-
-function drawEllipse(equation) {
-    var parts = equation.split('+');
-    var a = Math.sqrt(parseFloat(parts[0].match(/\/([0-9]+)/)[1]));
-    var b = Math.sqrt(parseFloat(parts[1].match(/\/([0-9]+)/)[1]));
-
-    var rangeX = width / 2;
-    var rangeY = height / 2;
-    var scaleFactorX = rangeX / a;
-    var scaleFactorY = rangeY / b;
-
-    for (var y = -rangeY; y <= rangeY; y += 0.01) {
-        var x = a * Math.sqrt(1 - Math.pow(y / b, 2));
-        var plotX1 = width / 2 + x * scaleFactorX;
-        var plotY1 = height / 2 + y * scaleFactorY;
-        var plotX2 = width / 2 - x * scaleFactorX;
-        var plotY2 = height / 2 + y * scaleFactorY;
-        rect(plotX1, plotY1, 1, 1);
-        rect(plotX2, plotY2, 1, 1);
-    }
-}
-
-function drawEllipseFunction(equation) {
-    var pattern = /\(x\s*\^\s*2\s*\/\s*(\d+)\)\s*\+\s*\(y\s*\^\s*2\s*\/\s*(\d+)\)\s*=\s*1/;
-    var match = equation.match(pattern);
-    if (match === null) {
-        console.log('Invalid equation');
-        return;
-    }
-    var a = Math.sqrt(parseFloat(match[2])); 
-    var b = Math.sqrt(parseFloat(match[1])); 
-
-    var rangeX = width / 2;
-    var rangeY = height / 2;
-    var scaleFactorX = rangeX / a;
-    for (var y = -rangeY; y <= rangeY; y += 0.01) {
-        var x = a * Math.sqrt(1 - Math.pow(y / b, 2));
-        var plotX1 = width / 2 + x * scaleFactorX;
-        var plotY1 = height / 2 + y;
-        var plotX2 = width / 2 - x * scaleFactorX;
-        var plotY2 = height / 2 + y;
-        rect(plotX1, plotY1, 1, 1);
-        rect(plotX2, plotY2, 1, 1);
-    }
-}
 
 
 onEvent("equal", "click", function() {
@@ -255,12 +289,16 @@ onEvent("equal", "click", function() {
     clearCanvas();
     drawAxes();
     hideElement("alert");
+    show();
+    
     
     var funcString = getText("function1").trim();
     funcString = funcString.replace(/\s/g, '');
     funcString = funcString.toLowerCase();
     console.log(funcString);
     var functionType = levels[count];
+    setText("info1","Eq: "+funcString);
+
     if (!functionType) {
         console.log("Livello non valido!");
         return;
@@ -276,6 +314,7 @@ onEvent("equal", "click", function() {
             break;
         
         case "circle":
+
             if (!isCircleFunction(funcString) & !isCircle(funcString)) {
                 showElement("alert");
                 setText("alert", "Error. For level " + count + ", enter the equation of a circle with center at the origin of the axes.");
@@ -283,13 +322,13 @@ onEvent("equal", "click", function() {
             }
             else if(isCircle(funcString)){
               showElement("alert");
-              setText("alert", "The equation inserted "+funcString +", is a Circle but not the equation of a circle with center at the origin of the axes. I will try to draw it. ");
+              setText("alert", "The equation inserted is a Circle but not the equation of a circle with center at the origin of the axes. I will try to draw it. ");
         
-              extractCircleABC(funcString);
+              drawCircle(1, 1,1, funcString, true);
               return;
 
             }
-            extractCircleABC(funcString,width/2,height / 2 );
+            drawCircle(1, 1,1, funcString, true);
             break;
       
             
@@ -301,11 +340,11 @@ onEvent("equal", "click", function() {
             } 
             else if (isParab(funcString)) {
                 showElement("alert");
-                setText("alert", "The equation inserted " + funcString + " is a parabola, but not the equation of a parabola passing through the point (1,2) and having the vertex at the origin. I will try to draw it.");
+                setText("alert", "The equation inserted is a parabola, but not the equation of a parabola passing through the point (1,2) and having the vertex at the origin. I will try to draw it.");
                 drawParabolaFunction(funcString);
                 return;
             }
-            drawParabolaFunc(funcString);
+            drawParabolaFunction(funcString);
             break;
         
                     
@@ -317,12 +356,17 @@ onEvent("equal", "click", function() {
             } 
             else if (isEllipse(funcString)) {
                 showElement("alert");
-                setText("alert", "The equation inserted " + funcString + " is an ellipse, but not the equation of an ellipse with vertices at points v1:(5, 0), v2: (-5, 0), v3:(0,3), v4:(0,-3). I will try to draw it.");
-                drawEllipse(funcString);
+                setText("alert", "The equation inserted is an ellipse, but not the equation of an ellipse with vertices at points v1:(5, 0), v2: (-5, 0), v3:(0,3), v4:(0,-3). I will try to draw it.");
+                drawEllipse(1,2,funcString);
 
                 return;
             }
-            drawEllipseFunction(funcString);
+            var ellipsePattern = /\s*x\s*\^\s*2\s*\/\s*25\s*\+\s*y\s*\^\s*2\s*\/\s*9\s*=\s*1/;
+            if (ellipsePattern.test(funcString)) {
+              funcString = funcString.replace(/\s*x\s*\^\s*2\s*\/\s*25\s*\+\s*y\s*\^\s*2\s*\/\s*9\s*=\s*1/, "(x^2/25)+(y^2/9)=1");
+            }
+            console.log(funcString);
+            drawEllipse(1, 1, funcString);
             break;
 
         default:
@@ -344,7 +388,7 @@ onEvent("next", "click", function( ) {
   hideElement("next");
   setScreen("SpiegazioneLivello");
   setText("Livello", count);
-  
+  show();
   if(count==1){
     setText("Funzione", "Line in explicit form (with values)");
   }
@@ -362,26 +406,27 @@ onEvent("next", "click", function( ) {
 
 
 onEvent("draw", "click", function( ) {
-    var a = parseFloat(getText("a").trim());
-    var b = parseFloat(getText("b").trim());
-    var c = parseFloat(getText("c").trim());
-    a = a.toFixed(2);
-    b = b.toFixed(2);
-    c = c.toFixed(2);
+  show();
+  var a = parseInt(getText("a").trim());
+  var b = parseInt(getText("b").trim());
+  var c = parseInt(getText("c").trim());
+  var equation="";
    if (count === 1) {
         if (!isNaN(a) && !isNaN(b) && !isNaN(c)) {
             var m=(-a / b);
             m=m.toFixed(2);
+            setText("info2","m="+m);
             var q=(-c / b);
             q=q.toFixed(2);
-            var equation = "y=" + m + "x+" +q;
+            equation = "y=" + m + "x+" +q;
             equation = equation.replace(/\s/g, '');
             setActiveCanvas("graphic");
             clearCanvas();
             drawAxes();
             drawLinearFunction(equation);
+            setText("info1", "Equation: " + equation);
             showElement("alert");
-            setText("alert", "Equation: " + equation+".\n Remember that you have to insert the equation of the line in the form y=mx+q in order to proceed to the next level. (on the left side)");
+            setText("alert", "Remember that you have to insert the equation of the line in the form y=mx+q in order to proceed to the next level. (on the left side)");
         } else {
             showElement("alert");
             setText("alert", "Make sure to enter all values for a, b, and c.");
@@ -389,22 +434,16 @@ onEvent("draw", "click", function( ) {
   }
   else if(count==2){
       if (!isNaN(a) && !isNaN(b) && !isNaN(c)) {
-        var h = -a / 2;
-        var k = -b / 2;
-        var r = Math.sqrt(Math.abs(c-(Math.pow(a, 2)+ Math.pow(b, 2))/4));
-        r = r.toFixed(2);
-        console.log(r);
-        var equation = "(x" + (h < 0 ? "-" : "+") + " " + Math.abs(h) + ")^2+(y" + (k < 0 ? "-" : "+") + " " + Math.abs(k) + ")^2=" + r + "^2.";
-        equation = equation.replace(/\s/g, ''); 
-
+        equation = "x^2+y^2+" + a + "x+" + b + "y+" + c + "=0";
         console.log(equation);
         setActiveCanvas("graphic");
         clearCanvas();
         drawAxes();
-
-        drawCircle(a, b, c);
+        drawCircle(a, b, c, equation, false);
+        showElement("info1");
+        setText("info1", "Equation:" + equation);
         showElement("alert");
-        setText("alert", "Equation: " + equation+"\n Remember that you have to insert the equation of the circle with center at the origin and the radius=2.");
+        setText("alert", "Remember that you have to insert the equation of the circle with center at the origin and the radius=2.");
     } else {
             showElement("alert");
             setText("alert", "Make sure to enter all values for a, b, and c.");
@@ -412,16 +451,16 @@ onEvent("draw", "click", function( ) {
   }
   else if(count==3){
     if (!isNaN(a) && !isNaN(b) && !isNaN(c)) {
-      var equation = "y = " + a + "x^2 " + (b < 0 ? "-" : "+") + " " + Math.abs(b) + "x " + (c < 0 ? "-" : "+") + " " + Math.abs(c);
+      equation = "y = " + a + "x^2 " + (b < 0 ? "-" : "+") + " " + Math.abs(b) + "x " + (c < 0 ? "-" : "+") + " " + Math.abs(c);
       console.log(equation);
       setActiveCanvas("graphic");
       clearCanvas();
       drawAxes();
       equation = equation.replace(/\s/g, ''); // Remove white spaces
-
+      setText("info1", "Equation: " + equation);
       drawParabolaFunction(equation);
       showElement("alert");
-      setText("alert", "Equation: " + equation+ "\nRemember that you have to insert the equation of the parabola with the vertex at the origin and passing through the point (1,2) in order to proceed to the next level.");
+      setText("alert", "Remember that you have to insert the equation of the parabola with the vertex at the origin and passing through the point (1,2) in order to proceed to the next level.");
     } else {
       showElement("alert");
       console.log("Make sure to enter all the values a, b and c.");
@@ -434,14 +473,16 @@ onEvent("draw", "click", function( ) {
       setText("alert", "You can't insert c for ellipse equation.");
     }
     else if (!isNaN(a) && !isNaN(b)) {
-      var equation = "x^2/" + a*a + " - y^2/" + b*b + " = 1";
+      equation = "(x^2/" + a*a + ") + (y^2/"+b*b+ ") = 1";
       equation = equation.replace(/\s/g, ''); 
       console.log(equation);
       setActiveCanvas("graphic");
       clearCanvas();
       drawAxes();
+      setText("info1", "Eq: " + equation);
       showElement("alert");
-      setText("alert", "Equation: " + equation+ "\nRemember that you have to insert the equation of the ellipse with the vertices at points v1:(5, 0), v2: (-5, 0), v3:(0,3), v4:(0,-3) in order to proceed to the next level.");
+      drawEllipse(a, b, equation);
+      setText("alert", "Remember that you have to insert the equation of the ellipse with the vertices at points v1:(5, 0), v2: (-5, 0), v3:(0,3), v4:(0,-3) in order to proceed to the next level.");
     } else {
       showElement("alert");
       console.log("Make sure to enter all the values a, b.");
