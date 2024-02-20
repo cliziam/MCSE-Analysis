@@ -144,23 +144,28 @@ display_options_and_continue :-
 % gestisce gli steps successivi
 advance_step :-
     current_step(CurrentStep),
-    (inventory_contains(bible) -> NextStep is 9 ; NextStep is CurrentStep + 1),
+    (inventory_contains(bible) ->
+        (CurrentStep =< 8 -> NextStep is 9 ; NextStep is CurrentStep + 1)
+    ;
+        NextStep is CurrentStep + 1
+    ),
     retractall(current_step(_)),
     asserta(current_step(NextStep)).
 
-% Processa la scelta dell'utente
+
+
+% Process the user's choice
 process_choice(CurrentStep, UserChoice) :-
     consequence(CurrentStep, UserChoice, Consequence),
     write(Consequence), nl,
     (valid_choice(CurrentStep, UserChoice) ->
         (puzzle(CurrentStep, PuzzlePrompt, Feedback, Solution) ->
             write('----------------------------------------------------------------------------- '), nl,
-            write('           ALT!! Put yourself to the test! (write the answer in lowercase):   '), nl,
+            write('         ALT!! Put yourself to the test! (write the answer in lowercase):     '), nl,
             write(PuzzlePrompt),nl, 
             write('----------------------------------------------------------------------------- '), nl,
             write(Feedback), nl,
-            read(UserAnswer),
-            check_puzzle_answer(UserAnswer, Solution),
+            check_puzzle_answer(Solution),
             display_inventory_progress,
             check_inventory_progress,
             display_options_and_continue
@@ -170,28 +175,45 @@ process_choice(CurrentStep, UserChoice) :-
             display_options_and_continue
         )
     ;
-        write('Invalid choice! Restart.'), nl, 
-        restart_game
+        write('------------------------Invalid choice! Go back one step.------------------------------'), nl, 
+        write(''), nl, 
+        back_game
     ).
 
-% Controlla se il gioco è completato
-check_game_completion :-
-    current_step(11),
-    write('Thank you for playing the Adventure of Robinson Crusoe! Feel free to play again and explore different paths in the story.'), nl, !.
+% Ask the user a question and parse the response
+ask(Prompt, Answer) :-
+    write(Prompt),
+    flush_output(current_output), 
+    get_char(_), % Attendi l'input dell'utente
+    read_line_to_string(user_input, Answer). % Legge un'intera linea di input dall'utente
 
-% controlla che la risposta dei puzzle sia corretta
-check_puzzle_answer(UserAnswer, Solution) :-
-    nonvar(UserAnswer),
-    atom_string(UserAnswer, UserAnswerString),
-    atom_string(SolutionAtom, Solution),
-    string_lower(UserAnswerString, LowerUserAnswer),
-    string_lower(SolutionAtom, LowerSolution),
-    (LowerUserAnswer == LowerSolution ->
+% Check if the puzzle answer is correct
+check_puzzle_answer(Solution) :-
+    puzzle_prompt(Prompt),
+    ask(Prompt, UserAnswer),
+    string_lower(Solution, LowerSolution),
+    string_lower(UserAnswer, LowerUserAnswer),
+    response_answer(LowerUserAnswer, LowerSolution).
+
+% Define the puzzle prompt based on the puzzle ID
+puzzle_prompt(Prompt) :-
+    current_step(CurrentStep),
+    puzzle(CurrentStep, Prompt, _, _).
+
+% Check if the response matches the solution
+response_answer(Response, Solution) :-
+    (Response == Solution ->
         write('Correct! You unlocked a piece of the puzzle.'), nl,
         add_to_inventory(puzzle_piece)
     ;
         write('Incorrect! The provided answer was not correct.'), nl
     ).
+
+
+% Controlla se il gioco è completato
+check_game_completion :-
+    current_step(11),
+    write('Thank you for playing the Adventure of Robinson Crusoe! Feel free to play again and explore different paths in the story.'), nl, !.
 
 
 
@@ -236,10 +258,15 @@ unlock_special_item :-
     add_to_inventory(bible).
 
 
-% Ricomincia il gioco
-restart_game :-
-    retractall(current_step(_)),
-    asserta(current_step(1)),
+% torna indietro
+back_game :-
+    current_step(CurrentStep),
+    (CurrentStep > 1 ->
+        NewStep is CurrentStep - 1,
+        retractall(current_step(_)),
+        asserta(current_step(NewStep))
+    ;
+        true
+    ),
     retractall(inventory(_)),
     asserta(inventory([])).
-
