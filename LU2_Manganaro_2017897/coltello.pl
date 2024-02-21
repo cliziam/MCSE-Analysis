@@ -71,7 +71,7 @@ consequence(10, "Embrace your newfound wealth and enjoy life in London", "Back i
 consequence(10, "Promise yourself to live new adventures", "Deciding to live new adventures, you continue your quest for knowledge and adventure. The future unfolds before you with endless possibilities. Congratulations! You have completed the game.").
 
 % Puzzle da risolvere 
-puzzle(3, "The Authenticity of the Story: ", "Is the story based on real events?.", "Yes").
+puzzle(3, "The Authenticity of the Story: ", "Is the story based on real events?.", "yes").
 puzzle(7, "Answer Friday's questions: ", "Friday poses questions about your life on the island. Reflect on the most challenging aspect of your early days in solitude and how you overcame it. The answer is a single word", "faith").
 puzzle(5, "The Famous Parrot: ", "In the story, what is the name of the famous parrot that accompanies the protagonist on the deserted island?", "poll").
 
@@ -82,6 +82,12 @@ puzzle(5, "The Famous Parrot: ", "In the story, what is the name of the famous p
 :- dynamic inventory/1.
 inventory([]).
 current_step(1).
+
+
+inventory_object(map, "Map", "You discovered a map! It reveals hidden treasures and paths on the island.").
+puzzle_object(3, map).
+puzzle_object(7, knife).
+puzzle_object(5, light).
 
 % Inizializza lo stato del gioco
 start_game :-
@@ -141,16 +147,19 @@ display_options_and_continue :-
     write(" "), nl,
     advance_step.
 
-% gestisce gli steps successivi
+% Modifica la logica di avanzamento degli steps per includere le avventure degli oggetti nell'inventario
 advance_step :-
     current_step(CurrentStep),
     (inventory_contains(bible) ->
-        (CurrentStep =< 8 -> NextStep is 9 ; NextStep is CurrentStep + 1)
+        (CurrentStep =< 8 -> NextStep is 9 ; NextStep is CurrentStep + 1),
+        retractall(current_step(_)),
+        asserta(current_step(NextStep)),
+        (adventure_for_object(bible) ; true)
     ;
-        NextStep is CurrentStep + 1
-    ),
-    retractall(current_step(_)),
-    asserta(current_step(NextStep)).
+        NextStep is CurrentStep + 1,
+        retractall(current_step(_)),
+        asserta(current_step(NextStep))
+    ).
 
 
 
@@ -203,8 +212,14 @@ puzzle_prompt(Prompt) :-
 % Check if the response matches the solution
 response_answer(Response, Solution) :-
     (Response == Solution ->
-        write('Correct! You unlocked a piece of the puzzle.'), nl,
-        add_to_inventory(puzzle_piece)
+        write('Correct!'), nl,
+        (puzzle(CurrentStep, _, _, Solution), puzzle_object(CurrentStep, Object) ->
+            format('You unlocked a special item: ~w.', [Object]), nl,
+            add_to_inventory(Object)
+        ; 
+            write('But nothing happened.'), nl
+        ),
+        advance_step % Avanza il passo dopo aver risolto il puzzle
     ;
         write('Incorrect! The provided answer was not correct.'), nl
     ).
@@ -217,12 +232,20 @@ check_game_completion :-
 
 
 
-% se le risposte dei puzzle sono corretti allora aggiunge un elemento all'inventario
+% Aggiorna la logica di aggiunta degli oggetti all'inventario
 add_to_inventory(Item) :-
     inventory(Inventory),
     append(Inventory, [Item], NewInventory),
     retractall(inventory(_)),
-    asserta(inventory(NewInventory)).
+    asserta(inventory(NewInventory)),
+    format('You obtained ~w!~n', [Item]),
+    display_inventory_object_description(Item),
+    advance_step.
+
+% Aggiungi una regola per mostrare la descrizione degli oggetti nell'inventario
+display_inventory_object_description(Item) :-
+    inventory_object(Item, _, Description),
+    write(Description), nl.
 
 
 % Verifica se un elemento è presente nell'inventario
@@ -271,3 +294,10 @@ back_game :-
     retractall(inventory(_)),
     asserta(inventory([])).
 
+
+
+adventure_for_object(map) :-
+    % Aggiungi l'avventura specifica per la mappa
+    write('You found a map! It reveals hidden treasures and paths on the island. You decide to explore the island further.'), nl,
+    % Aggiungi altre azioni o decisioni basate sulla presenza della mappa nell'inventario
+    advance_step.
