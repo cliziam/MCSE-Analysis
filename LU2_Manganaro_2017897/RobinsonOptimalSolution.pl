@@ -74,9 +74,15 @@ consequence(10, "Promise yourself to live new adventures", "Deciding to live new
 puzzle(3, "The Authenticity of the Story: ", "Is the story based on real events?.", "Yes").
 puzzle(7, "Answer Friday's questions: ", "Friday poses questions about your life on the island. Reflect on the most challenging aspect of your early days in solitude and how you overcame it. The answer is a single word", "faith").
 puzzle(5, "The Famous Parrot: ", "In the story, what is the name of the famous parrot that accompanies the protagonist on the deserted island?", "poll").
+% oggetti 
+puzzle_object(3, map).
+puzzle_object(5, knife).
+
 
 % discotiguos è utile per fare caoire che start_game potrebbe essere definito in modo non contiguo nel codice
 :- discontiguous start_game/0.
+
+
 % dynamic serve per dire che ha una dichiarazione dinamica e varia durante l'esecuzione del programma
 :- dynamic current_step/1.
 :- dynamic inventory/1.
@@ -180,12 +186,11 @@ process_choice(CurrentStep, UserChoice) :-
         back_game
     ).
 
-% Ask the user a question and parse the response
 ask(Prompt, Answer) :-
     write(Prompt),
     flush_output(current_output), 
-    get_char(_), % Attendi l'input dell'utente
-    read_line_to_string(user_input, Answer). % Legge un'intera linea di input dall'utente
+    get_char(_),
+    read_line_to_string(user_input, Answer). 
 
 % Check if the puzzle answer is correct
 check_puzzle_answer(Solution) :-
@@ -200,21 +205,34 @@ puzzle_prompt(Prompt) :-
     current_step(CurrentStep),
     puzzle(CurrentStep, Prompt, _, _).
 
-% Check if the response matches the solution
 response_answer(Response, Solution) :-
     (Response == Solution ->
-        write('Correct! You unlocked a piece of the puzzle.'), nl,
-        add_to_inventory(puzzle_piece)
+        write('Correct! You unlocked something!'), nl,
+        (current_step(CurrentStep), CurrentStep \== 3, CurrentStep \== 5 ->
+            add_to_inventory(puzzle_piece) 
+        ; 
+            true
+        ),
+        (current_step(CurrentStep), CurrentStep == 3 -> 
+            add_to_inventory(map),
+            interact_with_map
+        ; 
+            true
+        ),
+        (current_step(CurrentStep), CurrentStep == 5 -> 
+            add_to_inventory(knife),
+            interact_with_knife
+        ; 
+            true
+        )
     ;
         write('Incorrect! The provided answer was not correct.'), nl
     ).
-
 
 % Controlla se il gioco è completato
 check_game_completion :-
     current_step(11),
     write('Thank you for playing the Adventure of Robinson Crusoe! Feel free to play again and explore different paths in the story.'), nl, !.
-
 
 
 % se le risposte dei puzzle sono corretti allora aggiunge un elemento all'inventario
@@ -231,20 +249,22 @@ inventory_contains(Item) :-
     member(Item, Inventory).
 
 
-
-% mostra quanti pezzi ha guagnato l'utente
 display_inventory_progress :-
     inventory(Inventory),
     length(Inventory, Pieces),
+    write(' '), nl,
     write('Inventory Progress: '), write(Pieces), write('/2 pieces collected.'), nl.
     
-% controllo dei pezzi
+:- dynamic special_item_unlocked/0.
+
 check_inventory_progress :-
     inventory(Inventory),
     length(Inventory, Pieces),
-    (Pieces >= 2 ->
+    (Pieces >= 2, \+ special_item_unlocked -> 
+        asserta(special_item_unlocked), 
         write('Congratulations! You have gathered enough puzzle pieces to unlock a special item.'), nl,
-        unlock_special_item;
+        unlock_special_item
+    ;
         true
     ).
 
@@ -271,3 +291,70 @@ back_game :-
     retractall(inventory(_)),
     asserta(inventory([])).
 
+
+
+adventure_for_object(map) :-
+    write('As you study the map, you notice some peculiar markings that seem to lead to a hidden cave.'), nl,
+    write('You decide to explore this cave, hoping to uncover its secrets.'), nl,
+    explore_cave.
+
+adventure_for_object(knife) :-
+    write(-----------------------------------------------------------------------), nl, 
+    write('      ______________________________ ______________________'), nl,
+    write('    .\'                              | (_)     (_)    (_)   \\'), nl,
+    write('  .\'                                |  __________________   |'), nl,
+    write('._\'.............................____|_(                  )_/'), nl,
+    write('                                                                    '), nl,
+    write('------------------------------------------------------------------------'), nl,
+    write('While exploring the dense vegetation, you come across a makeshift shelter.'), nl,
+    write('Inside, you find a rusty knife hidden among some old belongings.'), nl,
+    write('You carefully retrieve the knife, knowing it will be useful for various tasks on the island.'),nl,
+    write('                                                                    ').
+
+explore_cave :-
+    write('You cautiously enter the dark cave, your heart pounding with excitement.'), nl,
+    write('As you delve deeper, you stumble upon an ancient chest hidden in a crevice.'), nl,
+    write('Do you open the chest? (yes/no) '), nl,
+    flush_output(current_output), 
+    read_line_to_string(user_input, Answer),
+    string_lower(Answer, LowerInput),
+    process_chest_choice(LowerInput).
+
+process_chest_choice("yes") :-
+    write('You cautiously open the chest and find a dusty journal inside.'), nl,
+    write('The journal appears to belong to a previous inhabitant of the island.'), nl,
+    surprise_event_after_chest.
+
+process_chest_choice("no") :-
+    write('You decide to leave the chest undisturbed, fearing what secrets it may hold.').
+
+surprise_event_after_chest :-
+    random(1, 3, Surprise),
+    (Surprise =:= 1 ->
+        positive_surprise 
+    ;
+        negative_surprise 
+    ).
+
+positive_surprise :-
+    write('-----------------------------------WOWWWW!!!!--------------------------------------------------'), nl,
+    write('Suddenly, you stumble upon a hidden chamber filled with valuable treasures!'), nl,
+    write('Your eyes widen in amazement as you gather the treasures.'), nl,
+    write('You advance two steps in the story.'), nl,
+    advance_step.
+    
+negative_surprise :-
+    write('-----------------------------------HELP!!!!--------------------------------------------------'), nl,
+    write('Without warning, the ground beneath your feet gives way, and you fall into a pit!'), nl,
+    write('You are left bruised and shaken, but fortunately, you manage to climb out of the pit.'), nl,
+    write('-------------------------------------Go back one step-----------------------------------------'), nl,
+    write('----------------------------------------------------------------------------------------------'), nl,
+    back_game. 
+
+interact_with_map :-
+    inventory_contains(map), 
+    adventure_for_object(map).
+
+interact_with_knife :-
+    inventory_contains(knife),
+    adventure_for_object(knife).
